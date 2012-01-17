@@ -14,36 +14,38 @@
 
           modelValue = model.get(name);
           if (el.is(":checkbox")) {
-            if (($.isArray(modelValue) && modelValue.indexOf(modelValue) >= 0) || modelValue === el.val()) {
+            if (($.isArray(modelValue) && modelValue.indexOf(el.val()) >= 0) || modelValue === el.val()) {
               el.attr("checked", "checked");
             } else {
               el.removeAttr("checked");
             }
           } else {
-            return el.val(modelValue);
+            el.val(modelValue);
           }
+
+          return el;
         });
+
         return $(this).bind("change", function () {
-          var attrs, el, modelValue;
+          var attrs, checked, el, modelValue;
           attrs = {};
           el = $(this);
           modelValue = model.get(name);
 
           if (el.is(":checkbox")) {
-            if ($.isArray(model.get(name))) {
-              if (el.is(":checked")) {
-                return modelValue.push(el.val());
-              } else {
-                attrs[el.attr("name")] = _.without(modelValue, el.val());
-                return model.set(attrs);
-              }
+            checked = el.is(":checked");
+
+            if ($.isArray(modelValue)) {
+              attrs[name] = (checked) ? modelValue.slice().concat([el.val()]) : _.without(modelValue, el.val());
             } else {
-              attrs[el.attr("name")] = !!el.is(":checked")
+              attrs[name] = checked;
             }
+
           } else {
-            attrs[el.attr("name")] = el.val();
-            return model.set(attrs);
+            attrs[name] = el.val();
           }
+
+          return model.set(attrs);
         });
       });
     }
