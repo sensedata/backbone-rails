@@ -37,8 +37,15 @@
 
             if ($.isArray(modelValue)) {
               attrs[name] = (checked) ? modelValue.slice().concat([el.val()]) : _.without(modelValue, el.val());
-            } else {
+
+            } else if (/^(true|on|yes|1)$/i.test(el.val())) {
               attrs[name] = checked;
+
+            } else if (/^(false|off|no|0)$/i.test(el.val())) {
+              attrs[name] = !checked;
+
+            } else {
+              attrs[name] = el.val();
             }
 
           } else {
