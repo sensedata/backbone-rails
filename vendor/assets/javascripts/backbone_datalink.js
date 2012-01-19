@@ -45,7 +45,7 @@
               attrs[name] = !checked;
 
             } else {
-              attrs[name] = el.val();
+              attrs[name] = (checked) ? el.val() : null;
             }
 
           } else {
