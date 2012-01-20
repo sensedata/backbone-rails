@@ -1,32 +1,64 @@
-(function($) {
+(function ($) {
+  "use strict";
+
   return $.extend($.fn, {
-    backboneLink: function(model) {
-      return $(this).find(":input").each(function() {
+    backboneLink: function (model) {
+      return $(this).find(":input").each(function () {
         var el, name;
+
         el = $(this);
         name = el.attr("name");
 
-        if(typeof name !== "undefined" && name !== null) {
-          model.bind("change:" + name, function() {
-            val = model.get(name)
-            if ( el.is("input[type='checkbox']") && (val == true || val == false) )
-              el.prop('checked', val);
-            return el.val(val);
-          });
-
-          return $(this).bind("change", function() {
-            var attrs;
-            el = $(this);
-            attrs = {};
-            if ( el.is("input[type='checkbox']") )
-              attrs[el.attr("name")] = el.prop('checked');
-            else
-              attrs[el.attr("name")] = el.val();
-            return model.set(attrs);
-          });
+        if (_.isUndefined(name) || _.isEmpty(name)) {
+          return;
         }
+        
+        model.bind("change:" + name, function () {
+          var modelValue;
 
+          modelValue = model.get(name);
+          if (el.is(":checkbox")) {
+            if (($.isArray(modelValue) && modelValue.indexOf(el.val()) >= 0) || modelValue === el.val()) {
+              el.attr("checked", "checked");
+            } else {
+              el.removeAttr("checked");
+            }
+          } else {
+            el.val(modelValue);
+          }
+
+          return el;
+        });
+
+        return $(this).bind("change", function () {
+          var attrs, checked, el, modelValue;
+          attrs = {};
+          el = $(this);
+          modelValue = model.get(name);
+
+          if (el.is(":checkbox")) {
+            checked = el.is(":checked");
+
+            if ($.isArray(modelValue)) {
+              attrs[name] = (checked) ? modelValue.slice().concat([el.val()]) : _.without(modelValue, el.val());
+
+            } else if (/^(true|on|yes|1)$/i.test(el.val())) {
+              attrs[name] = checked;
+
+            } else if (/^(false|off|no|0)$/i.test(el.val())) {
+              attrs[name] = !checked;
+
+            } else {
+              attrs[name] = (checked) ? el.val() : null;
+            }
+
+          } else {
+            attrs[name] = el.val();
+          }
+
+          return model.set(attrs);
+        });
       });
     }
   });
-})(jQuery);
+}(jQuery));
