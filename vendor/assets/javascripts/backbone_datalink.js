@@ -4,7 +4,7 @@
   return $.extend($.fn, {
     backboneLink: function (model) {
       return $(this).find(":input").each(function () {
-        var el, name;
+        var el, name, copyFormToModel, copyModelToForm;
 
         el = $(this);
         name = el.attr("name");
@@ -12,8 +12,8 @@
         if (_.isUndefined(name) || _.isEmpty(name)) {
           return;
         }
-        
-        model.bind("change:" + name, function () {
+
+        copyModelToForm = function () {
           var modelValue;
 
           modelValue = model.get(name);
@@ -24,13 +24,13 @@
               el.removeAttr("checked");
             }
           } else {
-            el.val(modelValue);
+            (modelValue === null) ? el.val("") : el.val(modelValue);
           }
 
           return el;
-        });
+        };
 
-        return $(this).bind("change", function () {
+        copyFormToModel = function () {
           var attrs, checked, el, modelValue;
           attrs = {};
           el = $(this);
@@ -53,11 +53,17 @@
             }
 
           } else {
-            attrs[name] = el.val();
+            attrs[name] = (/^(\s*|null)$/.test(el.val())) ? null : el.val();
           }
 
           return model.set(attrs);
-        });
+        };
+
+        copyModelToForm();
+        model.bind("change:" + name, copyModelToForm);
+        el.bind("change", copyFormToModel);
+
+        return el;
       });
     }
   });
