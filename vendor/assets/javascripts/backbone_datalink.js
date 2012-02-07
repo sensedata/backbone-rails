@@ -23,6 +23,11 @@
             } else {
               el.removeAttr("checked");
             }
+
+          } else if (el.is(":radio")) {
+            if (modelValue === el.val()) {
+              el.attr("checked", "checked");
+            }
           } else {
             (modelValue === null) ? el.val("") : el.val(modelValue);
           }
@@ -50,6 +55,14 @@
 
             } else {
               attrs[name] = (checked) ? el.val() : null;
+            }
+
+          } else if (el.is(":radio")) {
+            if (el.is(":checked")) {
+              attrs[name] = el.val();
+
+            } else if (modelValue === el.val()) {
+              attrs[name] = null;
             }
 
           } else {
