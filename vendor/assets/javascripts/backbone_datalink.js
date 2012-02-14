@@ -4,7 +4,7 @@
   return $.extend($.fn, {
     backboneLink: function (model) {
       return $(this).find(":input").each(function () {
-        var el, name, copyFormToModel, copyModelToForm;
+        var copyFormToModel, copyModelToForm, el, elIsEqualTo, name;
 
         el = $(this);
         name = el.attr("name");
@@ -13,19 +13,28 @@
           return;
         }
 
+        elIsEqualTo = function (modelValue) {
+          if (modelValue === el.val()) {
+            return true;
+          } else if (modelValue === undefined) {
+            
+          }
+          return (modelValue === el.val()) || (modelValue !== undefined && modelValue.toString() === el.val());
+        };
+
         copyModelToForm = function () {
           var modelValue;
 
           modelValue = model.get(name);
           if (el.is(":checkbox")) {
-            if (($.isArray(modelValue) && modelValue.indexOf(el.val()) >= 0) || modelValue === el.val()) {
+            if (($.isArray(modelValue) && modelValue.indexOf(el.val()) >= 0) || elIsEqualTo(modelValue)) {
               el.attr("checked", "checked");
             } else {
               el.removeAttr("checked");
             }
 
           } else if (el.is(":radio")) {
-            if (modelValue === el.val()) {
+            if (elIsEqualTo(modelValue)) {
               el.attr("checked", "checked");
             }
           } else {
@@ -61,7 +70,7 @@
             if (el.is(":checked")) {
               attrs[name] = el.val();
 
-            } else if (modelValue === el.val()) {
+            } else if (elIsEqualTo(modelValue)) {
               attrs[name] = null;
             }
 
