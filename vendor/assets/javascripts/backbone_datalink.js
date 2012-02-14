@@ -38,7 +38,11 @@
               el.attr("checked", "checked");
             }
           } else {
-            (modelValue === null) ? el.val("") : el.val(modelValue);
+            if (modelValue === null) {
+              el.val("");
+            } else {
+              el.val(modelValue);
+            }
           }
 
           return el;
